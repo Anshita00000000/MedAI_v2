@@ -1,0 +1,45 @@
+# Core web framework
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+streamlit>=1.32.0
+
+# AI / ML
+openai-whisper>=20231117
+transformers>=4.40.0
+torch>=2.2.0
+accelerate>=0.29.0
+
+# Speaker diarisation
+pyannote.audio>=3.1.0
+
+# NLP / NER
+spacy>=3.7.0
+scispacy>=0.5.4
+medspacy>=1.1.2
+negspacy>=1.0.4
+gliner>=0.2.0
+
+# Vector store / RAG
+sentence-transformers>=2.7.0
+chromadb>=0.5.0
+
+# PDF / reporting
+weasyprint>=62.0
+jinja2>=3.1.0
+
+# Evaluation
+jiwer>=3.0.4
+rouge-score>=0.1.2
+bert-score>=0.3.13
+
+# Data / utilities
+pandas>=2.2.0
+numpy>=1.26.0
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+python-dotenv>=1.0.0
+pydantic>=2.6.0
+pypdf>=4.0.0
+
+# Google Gemini
+google-genai>=0.7.0

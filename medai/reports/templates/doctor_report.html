@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MedAI Clinical Report</title>
+<style>
+  :root {
+    --navy: #0B1F3A;
+    --teal: #0D7377;
+    --white: #FFFFFF;
+    --light-bg: #F0F4F8;
+    --red: #C0392B;
+    --orange: #E67E22;
+    --yellow: #F1C40F;
+    --green: #27AE60;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 11pt;
+    color: #1a1a1a;
+    background: var(--white);
+    line-height: 1.5;
+  }
+  header {
+    background: var(--navy);
+    color: var(--white);
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  header h1 { font-size: 22pt; letter-spacing: 1px; }
+  header .meta { font-size: 9pt; text-align: right; }
+  .urgency-banner {
+    padding: 10px 30px;
+    font-weight: bold;
+    font-size: 12pt;
+    text-align: center;
+    color: var(--white);
+  }
+  .urgency-CRITICAL { background: var(--red); }
+  .urgency-HIGH     { background: var(--orange); }
+  .urgency-MEDIUM   { background: var(--yellow); color: #333; }
+  .urgency-LOW      { background: var(--green); }
+  .container { padding: 24px 36px; }
+  h2 {
+    color: var(--teal);
+    border-bottom: 2px solid var(--teal);
+    padding-bottom: 4px;
+    margin: 20px 0 10px;
+    font-size: 13pt;
+  }
+  h3 { color: var(--navy); margin: 12px 0 6px; font-size: 11pt; }
+  .soap-section {
+    background: var(--light-bg);
+    border-left: 4px solid var(--teal);
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    border-radius: 0 4px 4px 0;
+  }
+  .soap-section pre {
+    white-space: pre-wrap;
+    font-family: inherit;
+    font-size: 10.5pt;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 10pt;
+  }
+  th {
+    background: var(--navy);
+    color: var(--white);
+    padding: 8px 10px;
+    text-align: left;
+  }
+  td { padding: 7px 10px; border-bottom: 1px solid #ddd; }
+  tr:nth-child(even) td { background: var(--light-bg); }
+  .red-flags { list-style: none; }
+  .red-flags li::before { content: "⚠ "; color: var(--red); }
+  .code-badge {
+    display: inline-block;
+    background: var(--navy);
+    color: var(--white);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 9pt;
+    margin: 2px;
+  }
+  .teal-badge {
+    background: var(--teal);
+  }
+  footer {
+    background: var(--navy);
+    color: #aaa;
+    text-align: center;
+    padding: 12px;
+    font-size: 8pt;
+    margin-top: 30px;
+  }
+  .conf-high   { color: var(--green); font-weight: bold; }
+  .conf-medium { color: var(--orange); font-weight: bold; }
+  .conf-low    { color: var(--red); font-weight: bold; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>MedAI</h1>
+    <div style="font-size:9pt;color:#ccc;">Clinical Intelligence Platform</div>
+  </div>
+  <div class="meta">
+    <div>DOCTOR REPORT</div>
+    <div>Generated: {{ generated_at }}</div>
+    <div>Confidential — Clinician Use Only</div>
+  </div>
+</header>
+
+{% if risk %}
+<div class="urgency-banner urgency-{{ risk.urgency }}">
+  URGENCY: {{ risk.urgency }}{% if risk.red_flags %} — Red flags detected{% endif %}
+</div>
+{% endif %}
+
+<div class="container">
+
+  <!-- SOAP NOTE -->
+  <h2>SOAP Note</h2>
+
+  <h3>Subjective</h3>
+  <div class="soap-section"><pre>{{ soap.subjective }}</pre></div>
+
+  <h3>Objective</h3>
+  <div class="soap-section"><pre>{{ soap.objective }}</pre></div>
+
+  <h3>Assessment</h3>
+  <div class="soap-section"><pre>{{ soap.assessment }}</pre></div>
+
+  <h3>Plan</h3>
+  <div class="soap-section"><pre>{{ soap.plan }}</pre></div>
+
+  <!-- CLINICAL CODES -->
+  {% if soap.icd_codes or soap.hcc_codes %}
+  <h2>Clinical Codes</h2>
+  <div>
+    {% for code in soap.icd_codes %}
+    <span class="code-badge">ICD-10: {{ code }}</span>
+    {% endfor %}
+    {% for code in soap.hcc_codes %}
+    <span class="code-badge teal-badge">HCC {{ code }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- DIFFERENTIAL DIAGNOSES -->
+  {% if ddx and ddx.differentials %}
+  <h2>Differential Diagnoses</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Diagnosis</th>
+        <th>ICD-10</th>
+        <th>Confidence</th>
+        <th>KB Score</th>
+        <th>Reasoning</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for d in ddx.differentials %}
+      <tr>
+        <td>{{ d.rank }}</td>
+        <td>{{ d.disease_name }}</td>
+        <td>{{ d.icd10_code }}</td>
+        <td class="conf-{{ d.confidence_score | confidence_class }}">
+          {{ d.confidence_score | round(2) }}
+        </td>
+        <td>{{ d.kb_score | round(3) }}</td>
+        <td>{{ d.reasoning }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  <!-- RISK ASSESSMENT -->
+  {% if risk %}
+  <h2>Risk Assessment</h2>
+  <p><strong>Urgency:</strong> {{ risk.urgency }}</p>
+  <p><strong>Recommended Action:</strong> {{ risk.recommended_action }}</p>
+  <p><strong>Reasoning:</strong> {{ risk.reasoning }}</p>
+  {% if risk.red_flags %}
+  <h3>Red Flags</h3>
+  <ul class="red-flags">
+    {% for flag in risk.red_flags %}
+    <li>{{ flag }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% endif %}
+
+  <!-- TREATMENT RECOMMENDATIONS -->
+  {% if treatment %}
+  <h2>Treatment Recommendations</h2>
+  {% if treatment.recommendations %}
+  <table>
+    <thead>
+      <tr><th>Diagnosis</th><th>Intervention</th><th>Priority</th><th>Rationale</th></tr>
+    </thead>
+    <tbody>
+    {% for r in treatment.recommendations %}
+      <tr>
+        <td>{{ r.diagnosis }}</td>
+        <td>{{ r.intervention }}</td>
+        <td>{{ r.priority }}</td>
+        <td>{{ r.rationale }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  {% if treatment.medications %}
+  <h3>Medications</h3>
+  <table>
+    <thead>
+      <tr><th>Medication</th><th>Dose</th><th>Frequency</th><th>Duration</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+    {% for m in treatment.medications %}
+      <tr>
+        <td>{{ m.name }}</td>
+        <td>{{ m.dose }}</td>
+        <td>{{ m.frequency }}</td>
+        <td>{{ m.duration }}</td>
+        <td>{{ m.notes }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  {% if treatment.referrals %}
+  <h3>Referrals</h3>
+  <ul>{% for r in treatment.referrals %}<li>{{ r }}</li>{% endfor %}</ul>
+  {% endif %}
+
+  <p><strong>Follow-up:</strong> {{ treatment.follow_up }}</p>
+  {% endif %}
+
+</div>
+
+<footer>
+  Generated by MedAI using {{ soap.model_used }} | For clinical use only | Not a substitute for clinical judgment
+</footer>
+</body>
+</html>
