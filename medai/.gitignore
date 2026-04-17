@@ -1,0 +1,33 @@
+__pycache__/
+*.py[cod]
+*.so
+.env
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.eggs/
+
+# Data
+data/raw/
+data/processed/
+data/knowledge_base/chroma_db/
+
+# Models (large binary files)
+*.bin
+*.pt
+*.pth
+*.safetensors
+
+# Reports output
+*.pdf
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
