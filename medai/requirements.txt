@@ -1,45 +1,52 @@
-# Core web framework
-fastapi>=0.110.0
-uvicorn[standard]>=0.29.0
-streamlit>=1.32.0
+# ── Core web framework ────────────────────────────────────────────────────────
+fastapi==0.115.12
+uvicorn[standard]==0.34.3
+streamlit==1.45.1
 
-# AI / ML
-openai-whisper>=20231117
-transformers>=4.40.0
-torch>=2.2.0
-accelerate>=0.29.0
+# ── ASR ───────────────────────────────────────────────────────────────────────
+openai-whisper==20240930
 
-# Speaker diarisation
-pyannote.audio>=3.1.0
+# ── ML frameworks ─────────────────────────────────────────────────────────────
+# torch / transformers / accelerate are pre-installed on Colab and GPU VMs.
+# List them here only for plain venv installs; Colab users skip these.
+torch>=2.2.0,<3.0.0
+transformers==4.51.3
+accelerate==1.6.0
 
-# NLP / NER
-spacy>=3.7.0
-scispacy>=0.5.4
-medspacy>=1.1.2
-negspacy>=1.0.4
-gliner>=0.2.0
+# ── Speaker diarisation ───────────────────────────────────────────────────────
+pyannote.audio==3.3.2
 
-# Vector store / RAG
-sentence-transformers>=2.7.0
-chromadb>=0.5.0
+# ── NLP / NER ─────────────────────────────────────────────────────────────────
+spacy==3.7.5
+scispacy==0.5.5
+medspacy==1.1.3
+# negspacy removed — medspacy provides negation natively
+# gliner is optional (zero-shot NER); install separately if needed:
+#   pip install gliner==0.2.18
 
-# PDF / reporting
-weasyprint>=62.0
-jinja2>=3.1.0
+# ── Vector store / RAG ────────────────────────────────────────────────────────
+sentence-transformers==3.4.1
+chromadb==0.6.3
 
-# Evaluation
-jiwer>=3.0.4
-rouge-score>=0.1.2
-bert-score>=0.3.13
+# ── PDF / reporting ───────────────────────────────────────────────────────────
+weasyprint==62.3
+jinja2==3.1.6
 
-# Data / utilities
-pandas>=2.2.0
-numpy>=1.26.0
-requests>=2.31.0
-beautifulsoup4>=4.12.0
-python-dotenv>=1.0.0
-pydantic>=2.6.0
-pypdf>=4.0.0
+# ── Evaluation ────────────────────────────────────────────────────────────────
+jiwer==3.0.5
+rouge-score==0.1.2
+bert-score==0.3.13
 
-# Google Gemini
-google-genai>=0.7.0
+# ── Data / utilities ──────────────────────────────────────────────────────────
+pandas==2.2.3
+# numpy: accept both 1.x and 2.x — do NOT pin to 1.26.x on envs where
+# torch 2.x has already pulled in numpy 2.x
+numpy>=1.26.0,<3.0.0
+requests==2.32.3
+beautifulsoup4==4.13.4
+python-dotenv==1.1.0
+pydantic==2.11.4
+pypdf==5.5.0
+
+# ── Google Gemini (new SDK — NOT google-generativeai) ─────────────────────────
+google-genai==1.14.0
