@@ -93,12 +93,15 @@ class ClinicalNER:
             logger.warning("ClinicalBERT NER unavailable: %s", exc)
 
     def _load_gliner(self):
+        # gliner is optional — install separately: pip install gliner==0.2.18
         try:
-            from gliner import GLiNER
+            from gliner import GLiNER  # type: ignore[import]
             self._gliner_model = GLiNER.from_pretrained("urchade/gliner_mediumv2.1")
             logger.info("GLiNER loaded.")
+        except ImportError:
+            logger.info("GLiNER not installed (optional). Run: pip install gliner==0.2.18")
         except Exception as exc:
-            logger.warning("GLiNER unavailable: %s", exc)
+            logger.warning("GLiNER load failed: %s", exc)
 
     def extract(self, text: str, model: str = "scispacy") -> NERResult:
         t0 = time.time()

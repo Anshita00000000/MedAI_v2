@@ -1,4 +1,4 @@
-"""Negation detection for clinical entities using medSpaCy/negspaCy."""
+"""Negation detection for clinical entities using medSpaCy (built-in negation)."""
 
 import logging
 from typing import List
@@ -22,7 +22,7 @@ from medai.pipeline.identify.ner import Entity
 
 
 class NegationDetector:
-    """Detect negated clinical entities using medSpaCy negspaCy component."""
+    """Detect negated clinical entities using medSpaCy built-in negation detector."""
 
     def __init__(self):
         self.available = False
@@ -30,6 +30,7 @@ class NegationDetector:
 
         try:
             import medspacy
+            # medspacy 1.x uses "negation_detector" component name
             self._nlp = medspacy.load(enable=["negation_detector"])
             self.available = True
             logger.info("medSpaCy negation detector loaded.")
